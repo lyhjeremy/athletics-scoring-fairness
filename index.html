@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auditing the Scoring Tables — are they actually fair?</title>
+<meta name="description" content="Track & field's scoring tables claim every event is comparable. Testing that against 6,400 elite performances: the best score 68 points higher in some events than others.">
+<style>
+  :root{ --paper:#FBF8F1; --ink:#1a1a2e; --wine:#7a1f2b; --gold:#D4A537; --mut:#6b6656; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:Georgia,'Times New Roman',serif;line-height:1.65;}
+  .band{background:var(--ink);color:var(--paper);}
+  .band svg{display:block;width:100%;height:auto}
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px;}
+  header .wrap{padding:38px 22px 30px;}
+  h1{font-size:2.1rem;line-height:1.15;margin:0 0 10px;}
+  .sub{font-size:1.15rem;color:#d8d2c4;margin:0;font-style:italic;}
+  h2{font-size:1.5rem;margin:2.4em 0 .5em;border-bottom:2px solid var(--gold);padding-bottom:.2em;}
+  p{margin:.8em 0;} .lead{font-size:1.18rem;}
+  figure{margin:1.6em 0;text-align:center;}
+  figure img{max-width:100%;height:auto;border:1px solid #e7e0d0;border-radius:6px;background:#fff;}
+  figcaption{font-size:.92rem;color:var(--mut);margin-top:.5em;font-style:italic;}
+  .stats{display:flex;flex-wrap:wrap;gap:14px;margin:1.4em 0;}
+  .stat{flex:1 1 150px;background:#fff;border:1px solid #e7e0d0;border-left:4px solid var(--gold);border-radius:5px;padding:14px 16px;}
+  .stat b{display:block;font-size:1.7rem;color:var(--wine);line-height:1.1;}
+  .stat span{font-size:.9rem;color:var(--mut);}
+  em.k{color:var(--wine);font-style:normal;font-weight:bold;}
+  a{color:var(--wine);}
+  .note{background:#fff;border:1px solid #e7e0d0;border-left:4px solid var(--mut);border-radius:5px;padding:14px 18px;color:#4a463c;font-size:.98rem;}
+  footer{border-top:1px solid #e0d9c8;margin-top:3em;padding:22px 0 50px;color:var(--mut);font-size:.92rem;}
+  code{background:#efe9db;padding:.05em .35em;border-radius:3px;font-size:.9em;}
+</style>
+</head>
+<body>
+<div class="band">
+  <svg viewBox="0 0 760 132" preserveAspectRatio="none" role="img" aria-label="uneven bars">
+    <rect x="60" y="40" width="70" height="70" fill="#7a1f2b"/>
+    <rect x="160" y="55" width="70" height="55" fill="#b5651d"/>
+    <rect x="260" y="35" width="70" height="75" fill="#c99a3b"/>
+    <rect x="360" y="62" width="70" height="48" fill="#2a7f62"/>
+    <rect x="460" y="72" width="70" height="38" fill="#4a7ba6"/>
+    <rect x="560" y="80" width="70" height="30" fill="#4a7ba6"/>
+    <line x1="40" y1="110" x2="720" y2="110" stroke="#D4A537" stroke-width="2.5"/>
+  </svg>
+</div>
+<header>
+  <div class="wrap">
+    <h1>Are the Scoring Tables Actually Fair?</h1>
+    <p class="sub">Track &amp; field's universal currency, tested against the world's best.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="lead">All of track &amp; field runs on one quiet assumption: that 1200 points in the shot
+  put is exactly as impressive as 1200 points in the 100 m. The combined events, athlete-of-the-year
+  votes, every GOAT argument — all of it leans on the scoring tables treating events equally. So I put
+  that to the test against <strong>6,400 elite performances</strong>, each carrying the WA points the
+  sport itself awarded it.</p>
+
+  <div class="stats">
+    <div class="stat"><b>68 pts</b><span>gap between the best- and worst-scoring event's elite ceiling</span></div>
+    <div class="stat"><b>p ≈ 10⁻⁴²</b><span>that the events score equally — decisively rejected</span></div>
+    <div class="stat"><b>16 events</b><span>6,400 top performances, 134 nations (2023–24)</span></div>
+  </div>
+
+  <h2>The elite ceiling isn't level</h2>
+  <p>Rank each event by the median WA score of its top-30 performances and a clear gradient appears:
+  the <em class="k">5000 m and 1500 m</em> sit highest, a full 68 points above the <em class="k">javelin
+  and hammer</em> at the bottom. Running events score higher at the top than the throws and jumps.
+  Among today's elite, 1250 points is an unremarkable distance-running season — and a near-national-record
+  javelin throw.</p>
+  <figure>
+    <img src="figures/fairness_boxplots.png" alt="Box plots of elite WA scores by event, sorted, coloured by discipline">
+    <figcaption>Each event's top-30 WA scores. Distance running clusters high; throws and jumps sit below the norm.</figcaption>
+  </figure>
+  <figure>
+    <img src="figures/deviation.png" alt="Per-event deviation from the cross-event norm">
+    <figcaption>How far each event's elite ceiling sits above (wine) or below (blue) the cross-event norm.</figcaption>
+  </figure>
+
+  <h2>What it proves — and what it doesn't</h2>
+  <div class="note">An event's elite scores depend on <strong>two</strong> things: how the table converts
+  marks to points, <em>and</em> how deep its current field is. Distance running is in a golden, crowded
+  era; the hammer and javelin are thinner — and a thin event shows a lower ceiling even under a perfectly
+  fair table. So the honest claim isn't "the tables are miscoded." It's the sharper one:
+  <strong>equal points don't currently buy equal standing across events</strong> — part calibration, part
+  talent pool. The universal number is, in practice, worth more in some events than others.</div>
+
+  <p style="margin-top:1.6em;"><a href="https://github.com/lyhjeremy/athletics-scoring-fairness">Code &amp; full method on GitHub.</a></p>
+</main>
+
+<footer>
+  <div class="wrap">
+    Built by <a href="https://github.com/lyhjeremy">Jeremy Lee</a> ·
+    <a href="https://github.com/lyhjeremy/athletics-scoring-fairness">source on GitHub</a> ·
+    data scraped from World Athletics top lists · Kruskal-Wallis via <code>scipy</code>.
+  </div>
+</footer>
+</body>
+</html>

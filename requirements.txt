@@ -1,0 +1,8 @@
+# Data
+pandas>=2.0
+lxml>=4.9            # read_html for the World Athletics top-list tables
+
+# Analysis
+numpy>=1.24
+scipy>=1.10          # Kruskal-Wallis test
+matplotlib>=3.7
