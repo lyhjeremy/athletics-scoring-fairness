@@ -3,6 +3,7 @@
 **The World Athletics tables claim 1200 points in the shot put equals 1200 points in the 100 m. Do the world's best actually score the same across events?**
 
 > 🌐 **Overview:** https://lyhjeremy.github.io/athletics-scoring-fairness/
+> 📖 **In depth:** https://lyhjeremy.github.io/athletics-scoring-fairness/overview/
 
 Every cross-event comparison in track & field — combined events, athlete-of-the-year
 votes, "who's the GOAT" — rests on the WA scoring tables treating events
