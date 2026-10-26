@@ -1,54 +1,33 @@
-# Auditing the Scoring Tables: Are They Actually Fair?
+# Auditing the scoring tables: are they fair?
 
-*The one number that makes all of track & field comparable, put to the test against the global elite.*
+*The number that makes track and field comparable across events, tested against the 2023 and 2024 elite.*
 
-## The claim under the whole sport
+## The assumption
 
-Track & field runs on a quiet assumption: that the World Athletics scoring tables
-are *fair*. A 1200-point shot put is supposed to be exactly as impressive as a
-1200-point 100 m, and every cross-event comparison, the decathlon, athlete-of-the
--year, the endless GOAT arguments, leans on that equivalence holding. It's a strong
-empirical claim, and one you can test with data the sport publishes itself.
+Athletics leans on the World Athletics scoring tables being fair: a 1200-point shot put is meant to be exactly as good as a 1200-point 100 m. The combined events, athlete-of-the-year shortlists and every argument about the best athlete across events depend on that. It is also an empirical claim, and the sport publishes the data to test it.
 
-So I scraped the **World Athletics top lists**: for 16 events across 2023–24, the
-best ~100 performances each, and, crucially, the **WA points** each one was
-awarded. That's **6,400 elite performances**, every one carrying the sport's own
-verdict on how good it was. If the tables are fair, the very best performers in each
-event should reach roughly the same points ceiling.
+So I scraped the World Athletics top lists: for 16 events in 2023 and 2024, the top 100 performances for men and for women, each with the WA points it was awarded. That is 6,400 performances, every one carrying the sport's own score. If the tables are fair, the best performers in each event should reach about the same points ceiling.
 
-## The elite ceiling isn't level
+## The ceiling isn't level
 
 <p align="center">
-  <img src="figures/fairness_boxplots.png" alt="Box plots of elite WA scores by event" width="760">
+  <img src="figures/fairness_boxplots.png" alt="Horizontal box plots of the top-30 WA scores for each of 16 events, sorted by median and coloured by discipline group, with distance and sprint events right of the dashed norm line and javelin and hammer furthest left." width="760">
 </p>
 
-They don't. Rank the events by the median WA score of their top-30 performances and
-a clear gradient appears: the **5000 m and 1500 m sit highest**, a full **68 points**
-above the **javelin and hammer** at the bottom. A Kruskal-Wallis test. The
-non-parametric "are these distributions the same?", rejects equality at
-p ≈ 10⁻⁴². The pattern isn't noise, and it isn't random: **running events score
-higher at the top than the throws and jumps.** Among today's elite, 1250 WA points
-is an unremarkable distance-running season and a near-national-record javelin throw.
+I took the 30 highest scores in each event and compared their medians. The 5000 m is highest at 1272 and the 1500 m next at 1260. The javelin is lowest at 1203.5, with the hammer at 1208.5. The spread from top to bottom is 68.5 points. A Kruskal-Wallis test, the rank-based test of whether several samples come from the same distribution, rejects equality at H = 236, p ≈ 10⁻⁴².
+
+The ordering has a pattern. Of the eight events above the cross-event norm (1247.5, the median of the event medians), seven are running events; the shot put is the only field event. Of the eight below it, seven are jumps and throws; the 800 m is the only running event. A 1250-point mark is above the javelin's elite median and below the 5000 m's.
 
 <p align="center">
-  <img src="figures/deviation.png" alt="Per-event deviation from the cross-event norm" width="700">
+  <img src="figures/deviation.png" alt="Horizontal bar chart of each event's top-30 median WA score minus the cross-event norm, from the 5000 m at about plus 24 down to the javelin at minus 44." width="700">
 </p>
 
-## What it does, and doesn't, prove
+## What it does and doesn't prove
 
-Here's the part most "the tables are broken!" takes skip. An event's elite-score
-distribution is driven by **two** things at once: how the table converts marks to
-points, *and* how deep and hot the event's current field is. Distance running is in
-a golden, deeply contested era; the hammer and javelin are thinner. A perfectly fair
-table would *still* show a lower ceiling for a thinly contested event, simply because
-fewer athletes are out there pushing its frontier.
+An event's elite scores depend on two things at once: how the table converts marks to points, and how deep and competitive the event's current field is. A thinly contested event would show a lower ceiling even under a perfectly fair table, because fewer athletes are pushing its front. The hammer and javelin may be thinner fields than distance running, and this data can't tell those causes apart.
 
-So the honest reading is not "the shot put table is miscoded." It's the more
-interesting, more defensible claim: **equal WA points do not currently buy equal
-standing across events**, and that gap is part calibration, part talent pool. To
-cleanly separate the two you'd calibrate each event's table against a fixed frontier
-(the world record, say) rather than against who happens to be competing. The natural
-next step. But the headline survives: the one number the sport treats as universal
-is, in practice, worth measurably more in some events than others.
+So the defensible reading is that equal WA points don't currently buy equal standing across events, and the gap is some mix of calibration and talent pool. The study doesn't show that any single table is miscoded. To separate the two you would calibrate each table against a fixed frontier, such as the world record, instead of against whoever happens to be competing.
+
+Two smaller caveats. The top 30 pools men and women, so one sex can fill most of an event's elite slice. And two seasons is a short window; a different pair of years could reorder events near the norm.
 
 *Code: [github.com/lyhjeremy/athletics-scoring-fairness](https://github.com/lyhjeremy/athletics-scoring-fairness)*

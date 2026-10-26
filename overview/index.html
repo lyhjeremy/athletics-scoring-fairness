@@ -3,55 +3,57 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Auditing the scoring tables: does 1200 points mean the same thing in every event?</title>
-<meta name="description" content="The World Athletics tables claim cross-event equivalence. Tested against 6,400 elite performances, the median top-30 score ranges over 68 points between events. Kruskal-Wallis H = 236." />
-<meta name="theme-color" content="#EDEDE7" />
+<title>Auditing the World Athletics scoring tables across 16 events</title>
+<meta name="description" content="Tested against 6,400 elite performances from 2023 and 2024, the median WA score of each event's top 30 marks ranges over 68.5 points, from the 5000 m to the javelin. A Kruskal-Wallis test rejects equal distributions (H = 236)." />
+<meta name="theme-color" content="#EFEBE5" />
 <meta property="og:title" content="Auditing the scoring tables" />
-<meta property="og:description" content="Every cross-event comparison in athletics rests on the WA tables. Tested against the current elite, they are not level." />
+<meta property="og:description" content="Do 1200 WA points mean the same in every event? Among the 2023 and 2024 elite, the top-30 median ranges over 68.5 points." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://lyhjeremy.github.io/athletics-scoring-fairness/overview/" />
+<link href="" rel="stylesheet" />
 <style>
-@font-face{font-family:"Source Serif 4";src:url("../fonts/SourceSerif4-400.woff2")format("woff2");font-weight:400;font-display:swap}
-@font-face{font-family:"Source Serif 4";src:url("../fonts/SourceSerif4-600.woff2")format("woff2");font-weight:600;font-display:swap}
-@font-face{font-family:"IBM Plex Sans";src:url("../fonts/IBMPlexSans-400.woff2")format("woff2");font-weight:400;font-display:swap}
-@font-face{font-family:"IBM Plex Sans";src:url("../fonts/IBMPlexSans-600.woff2")format("woff2");font-weight:600;font-display:swap}
-@font-face{font-family:"IBM Plex Mono";src:url("../fonts/IBMPlexMono-400.woff2")format("woff2");font-weight:400;font-display:swap}
-
   :root {
-    --paper: #EDEDE7;
-    --card: #F5F5F0;
-    --plate: #F5F5F0;
-    --ink: #1C1E1B;
-    --ink2: #3d3d55;
-    --muted: #52564E;
-    --rule: #C6C7BF;
-    --accent: #7A5A1E;
-    --accent2: #2C5852;
-    --link: #8C3A1E;
-    --serif: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
-    --sans: 'Source Sans 3', -apple-system, system-ui, sans-serif;
-    --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
-    --shadow: 0 1px 2px rgba(26,26,46,.05), 0 10px 34px rgba(26,26,46,.07);
+    --paper: #EFEBE5;
+    --card: #F6F3EE;
+    --plate: #F6F3EE;
+    --ink: #211B19;
+    --ink2: #58504B;
+    --muted: #58504B;
+    --rule: #CDC5BE;
+    --accent: #A0362B;
+    --accent2: #2F5E3E;
+    --link: #A0362B;
+    --serif: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+    --sans: "IBM Plex Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --mono: "IBM Plex Mono", "SF Mono", Menlo, Consolas, monospace;
+    --display: "Big Shoulders Display", "Arial Narrow", sans-serif;
+    --edge: #7C736C;
     --spine:  92px;
     --col:    min(100% - 2.6rem, 62rem);
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --paper: #14141f;
-      --card: #1c1c2a;
-      --plate: #f7f4ec;
-      --ink: #F2EFE6;
-      --ink2: #C9C4B6;
-      --muted: #918B7D;
-      --rule: #33313f;
-      --accent: #E3BC5E;
-      --accent2: #E0899A;
-      --link: #22D3EE;
-      --shadow: 0 1px 2px rgba(0,0,0,.32), 0 10px 34px rgba(0,0,0,.4);
+      --paper: #1B1716;
+      --card: #25201E;
+      --plate: #25201E;
+      --ink: #ECE5DF;
+      --ink2: #AFA59D;
+      --muted: #AFA59D;
+      --rule: #3F3734;
+      --accent: #D88A7C;
+      --accent2: #7FB48E;
+      --link: #D88A7C;
+      --edge: #756A64;
     }
   }
 
-  * { box-sizing: border-box; }
+  @font-face{font-family:"Source Serif 4";src:url("../fonts/SourceSerif4-400.woff2")format("woff2");font-weight:400;font-display:swap}
+  @font-face{font-family:"Source Serif 4";src:url("../fonts/SourceSerif4-600.woff2")format("woff2");font-weight:600;font-display:swap}
+  @font-face{font-family:"IBM Plex Sans";src:url("../fonts/IBMPlexSans-400.woff2")format("woff2");font-weight:400;font-display:swap}
+  @font-face{font-family:"IBM Plex Sans";src:url("../fonts/IBMPlexSans-600.woff2")format("woff2");font-weight:600;font-display:swap}
+  @font-face{font-family:"IBM Plex Mono";src:url("../fonts/IBMPlexMono-400.woff2")format("woff2");font-weight:400;font-display:swap}
+
+  * { box-sizing: border-box; border-radius: 0; }
   html { scroll-behavior: smooth; }
   body {
     margin: 0; background: var(--paper); color: var(--ink);
@@ -210,54 +212,95 @@
     html { scroll-behavior: auto; }
     .btn { }
   }
+  @font-face{font-family:"Big Shoulders Display";src:url("../fonts/BigShouldersDisplay-700.woff2")format("woff2");font-weight:700;font-style:normal;font-display:swap}
+  @font-face{font-family:"Big Shoulders Display";src:url("../fonts/BigShouldersDisplay-800.woff2")format("woff2");font-weight:800;font-style:normal;font-display:swap}
 
+  .btn:hover { transform: none; background: var(--accent); border-color: var(--accent); color: var(--paper); }
+  .pull { border: 1px solid var(--edge); border-left: 1px solid var(--edge); background: transparent; }
+  .term { background: var(--card); color: var(--ink); border: 1px solid var(--rule); }
+  .term .c { color: var(--muted); } .term .g { color: var(--accent2); } .term .y { color: var(--accent); }
+  .logo, .hero h1, h2, .claim .n, .bignum { font-family: var(--display); }
+
+  /* Track: stadium scoreboard. Tall display numerals on an ink board, lane rules. */
+  .masthead { border-bottom: 1px solid var(--rule); padding-bottom: 18px; box-shadow: none; }
+  .masthead { border-bottom: 7px double var(--accent); }
+  .hero h1 { font-weight: 800; text-transform: uppercase; letter-spacing: .005em; line-height: .92;
+             font-size: clamp(50px, 9vw, 118px); max-width: 14ch; }
+  h2 { font-weight: 700; text-transform: uppercase; letter-spacing: .01em; font-size: clamp(30px, 4.4vw, 46px); line-height: 1; }
+  .claims { background: var(--ink); color: var(--paper); padding: 6px 26px 14px; gap: 0 40px; }
+  .claim, .claim:first-child, .claim:nth-child(2) { border-top: 1px solid color-mix(in srgb, var(--paper) 22%, transparent); }
+  .claim:first-child { border-top: 0; }
+  @media (min-width: 760px) { .claim:nth-child(2) { border-top: 0; } }
+  .claim .n { color: var(--paper); font-weight: 800; font-size: 60px; letter-spacing: .01em; }
+  .claim p { color: color-mix(in srgb, var(--paper) 78%, var(--ink)); }
+  .bignum { font-weight: 800; letter-spacing: 0; }
+  .route::before { width: 0; border-left: 1px solid var(--rule); box-shadow: none; }
+  .route { counter-reset: lane; }
+  .stop { counter-increment: lane; }
+  .stop::before { content: counter(lane); width: 30px; height: 30px; left: calc(var(--spine) / 2 - 15px); top: 2px;
+                  background: var(--paper); border: 2px solid var(--ink); font: 800 18px/26px var(--display);
+                  text-align: center; color: var(--ink); }
+  .stop--key::before { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+  .stop--end::before { background: var(--ink); color: var(--paper); }
+
+
+  .sheet { min-width: 560px; }
+  .sheet th, .sheet td { padding: 8px 12px; }
+  .sheet .pl { font: 800 20px/1 var(--display); width: 40px; color: var(--muted); text-align: center; }
+  .sheet td.num, .sheet th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .sheet .sgn { font: 800 21px/1 var(--display); color: var(--ink); width: 70px; }
+  .sheet .dv { width: 34%; position: relative; }
+  .sheet .dv::before { content: ""; position: absolute; left: 50%; top: 4px; bottom: 4px; border-left: 1px solid var(--edge); }
+  .sheet .dv span { display: block; height: 11px; }
+  .sheet .dv .pos { margin-left: 50%; background: var(--accent2); }
+  .sheet .dv .neg { margin-left: auto; margin-right: 50%; background: var(--accent); }
+  .sheet tr.norm td { border-top: 2px solid var(--ink); }
+  .sheet-note { font-family: var(--sans); font-size: 14.5px; color: var(--muted); margin: 10px 0 0; max-width: 62ch; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="masthead">
-    <div class="logo"><span class="dot" aria-hidden="true"></span>Auditing the Scoring Tables</div>
-    <div class="tagline">6,400 elite performances, 16 events</div>
+    <div class="logo"><span class="dot" aria-hidden="true"></span>Auditing the scoring tables</div>
+    <div class="tagline">6,400 elite performances, 16 events, Kruskal-Wallis</div>
   </header>
 
   <section class="hero">
-    <p class="kicker">The tables promise that 1200 points is 1200 points.</p>
-    <h1>Among the world's best, it isn't.</h1>
+    <p class="kicker">Testing the World Athletics points tables against the elite</p>
+    <h1>The best 5000 m runners outscore the best javelin throwers by 68.5 points</h1>
 
     <p class="hero-sub">
-      Combined events, athlete-of-the-year votes, every "who is the GOAT" argument
-, all of them rest on the World Athletics scoring tables treating events
-      equivalently. Tested directly against <strong>6,400 top performances across
-      16 events</strong>, the median score of an event's top 30 ranges over
-      <strong>68 points</strong>, from the 5000 m at <strong>+24</strong> above the
-      cross-event norm down to the javelin at <strong>−44</strong>. Kruskal-Wallis
-      rejects equality at <strong>H = 236, p ≈ 10⁻⁴²</strong>.
+      World Athletics points are meant to make a 1200-point shot put equal to a
+      1200-point 100 m. Combined events, cross-event awards and every comparison of
+      athletes from different events rely on that. I scraped 6,400 performances
+      from the 2023 and 2024 top lists, each with the points it was awarded, and
+      compared the median score of each event's top 30. If the tables were level,
+      those medians would sit close together. They range from 1203.5 in the javelin
+      to 1272 in the 5000 m, and a Kruskal-Wallis test rejects equal distributions
+      (H = 236, p &asymp; 10<sup>&minus;42</sup>).
     </p>
 
     <div class="cta-row">
       <a class="btn btn-primary" href="../">Read the short version</a>
-      <a class="textlink" href="https://github.com/lyhjeremy/athletics-scoring-fairness">or the code and data</a>
+      <a class="textlink" href="https://github.com/lyhjeremy/athletics-scoring-fairness">Code and data on GitHub</a>
     </div>
 
     <div class="claims">
       <div class="claim">
-        <div class="n">68 pts</div>
-        <p>spread in the elite ceiling between the highest-scoring and
-           lowest-scoring event.</p>
+        <div class="n">68.5 pts</div>
+        <p>Spread of the top-30 median WA score between the highest event (5000 m) and the lowest (javelin).</p>
       </div>
       <div class="claim">
-        <div class="n">+24</div>
-        <p>the 5000 m, furthest above the cross-event norm. The 1500 m sits close
-           behind it.</p>
+        <div class="n">+24.5</div>
+        <p>5000 m above the cross-event norm of 1247.5, the median of the 16 event medians.</p>
       </div>
       <div class="claim">
-        <div class="n">−44</div>
-        <p>the javelin, furthest below. Hammer and high jump sit down there too.</p>
+        <div class="n">&minus;44</div>
+        <p>Javelin below the norm. Hammer (&minus;39), high jump (&minus;28.5) and triple jump (&minus;27.5) follow.</p>
       </div>
       <div class="claim">
-        <div class="n">p ≈ 10⁻⁴²</div>
-        <p>for the hypothesis that all sixteen events score equally at the top.
-           Not a marginal result.</p>
+        <div class="n">H = 236</div>
+        <p>Kruskal-Wallis statistic across the 16 events' top-30 scores, p &asymp; 10<sup>&minus;42</sup>.</p>
       </div>
     </div>
   </section>
@@ -267,115 +310,117 @@
 <div class="route">
 
   <section class="stop">
-    <p class="eyebrow">Start · why it matters</p>
-    <h2>An invisible assumption under every comparison</h2>
+    <p class="eyebrow">The question</p>
+    <h2>A claim the sport's own data can test</h2>
     <p>
-      The scoring tables are the plumbing of athletics. Nobody argues about them,
-      because nobody notices them. But the moment anyone compares a decathlete's
-      javelin to their 1500 m, or ranks a shot putter against a miler for an award,
-      the tables are doing the work, and the whole exercise inherits whatever bias
-      they carry.
+      The scoring tables sit underneath every cross-event comparison: a
+      decathlete's javelin against their 1500 m, a shot putter against a miler for
+      an award, or a country's strength across events, as in my
+      <a href="https://lyhjeremy.github.io/national-strength-profiles/">national strength profiles</a>.
+      Any bias in the tables carries into all of them.
     </p>
     <p>
-      The claim is testable. If the tables are level, then the best javelin
-      throwers in the world and the best 5000 m runners in the world should be
-      earning roughly the same number of points, because both groups are at the
-      frontier of their event.
+      If the tables are level, the best performers in each event should earn about
+      the same number of points, because each group is at the front of its own
+      event. The World Athletics top lists publish the points each mark was
+      awarded, so this can be checked without recomputing anything.
     </p>
   </section>
 
   <section class="stop stop--key">
-    <p class="eyebrow">↓ the test</p>
-    <h2>The elite ceiling is not level</h2>
+    <p class="eyebrow">The result sheet</p>
+    <h2>Sixteen events against the norm</h2>
     <p>
-      Take each event's top 30 performances of 2023–24 and look at the median WA
-      score. If the tables were level these medians would cluster. They do not:
-      they spread across <strong>68 points</strong>.
+      For each event, the 30 highest WA scores from 2023 and 2024 (men and women
+      pooled), their median, and its distance from the median of all 16 event
+      medians (1247.5). From <code>tables/fairness_by_event.csv</code>.
     </p>
-    <p>
-      Distance and middle distance sit highest, with the <strong>5000 m</strong>
-      and <strong>1500 m</strong> at the top. Throws and jumps sit well below,
-      with the <strong>javelin</strong>, <strong>hammer</strong> and <strong>high
-      jump</strong> at the bottom. The Kruskal-Wallis test rejects equality
-      overwhelmingly.
-    </p>
-    <p>
-      Put plainly: the same 1250 points is a merely very good javelin throw and a
-      fairly ordinary 5000 m.
+    <div class="tablewrap" role="region" aria-label="Elite median WA score and deviation from the norm for 16 events" tabindex="0">
+      <table class="sheet">
+        <thead><tr><th>Pl</th><th>Event</th><th>Group</th><th class="num">Top-30 median</th><th>Below / above norm</th><th class="num">Dev</th></tr></thead>
+        <tbody>
+          <tr><td class="pl">1</td><td>5000 m</td><td>distance</td><td class="num">1272</td><td class="dv"><span class="pos" style="width:27.8%"></span></td><td class="num sgn">+24.5</td></tr>
+          <tr><td class="pl">2</td><td>1500 m</td><td>middle</td><td class="num">1260</td><td class="dv"><span class="pos" style="width:14.2%"></span></td><td class="num sgn">+12.5</td></tr>
+          <tr><td class="pl">3</td><td>100 m</td><td>sprint</td><td class="num">1259</td><td class="dv"><span class="pos" style="width:13.1%"></span></td><td class="num sgn">+11.5</td></tr>
+          <tr><td class="pl">4</td><td>200 m</td><td>sprint</td><td class="num">1258</td><td class="dv"><span class="pos" style="width:11.9%"></span></td><td class="num sgn">+10.5</td></tr>
+          <tr><td class="pl">5</td><td>Marathon</td><td>distance</td><td class="num">1254</td><td class="dv"><span class="pos" style="width:7.4%"></span></td><td class="num sgn">+6.5</td></tr>
+          <tr><td class="pl">6</td><td>10,000 m</td><td>distance</td><td class="num">1253.5</td><td class="dv"><span class="pos" style="width:6.8%"></span></td><td class="num sgn">+6</td></tr>
+          <tr><td class="pl">7</td><td>400 m</td><td>sprint</td><td class="num">1253</td><td class="dv"><span class="pos" style="width:6.2%"></span></td><td class="num sgn">+5.5</td></tr>
+          <tr><td class="pl">8</td><td>Shot put</td><td>throw</td><td class="num">1250</td><td class="dv"><span class="pos" style="width:2.8%"></span></td><td class="num sgn">+2.5</td></tr>
+          <tr class="norm"><td class="pl">9</td><td>Pole vault</td><td>jump</td><td class="num">1245</td><td class="dv"><span class="neg" style="width:2.8%"></span></td><td class="num sgn">&minus;2.5</td></tr>
+          <tr><td class="pl">10</td><td>800 m</td><td>middle</td><td class="num">1241.5</td><td class="dv"><span class="neg" style="width:6.8%"></span></td><td class="num sgn">&minus;6</td></tr>
+          <tr><td class="pl">11</td><td>Discus</td><td>throw</td><td class="num">1236</td><td class="dv"><span class="neg" style="width:13.1%"></span></td><td class="num sgn">&minus;11.5</td></tr>
+          <tr><td class="pl">12</td><td>Long jump</td><td>jump</td><td class="num">1224</td><td class="dv"><span class="neg" style="width:26.7%"></span></td><td class="num sgn">&minus;23.5</td></tr>
+          <tr><td class="pl">13</td><td>Triple jump</td><td>jump</td><td class="num">1220</td><td class="dv"><span class="neg" style="width:31.2%"></span></td><td class="num sgn">&minus;27.5</td></tr>
+          <tr><td class="pl">14</td><td>High jump</td><td>jump</td><td class="num">1219</td><td class="dv"><span class="neg" style="width:32.4%"></span></td><td class="num sgn">&minus;28.5</td></tr>
+          <tr><td class="pl">15</td><td>Hammer</td><td>throw</td><td class="num">1208.5</td><td class="dv"><span class="neg" style="width:44.3%"></span></td><td class="num sgn">&minus;39</td></tr>
+          <tr><td class="pl">16</td><td>Javelin</td><td>throw</td><td class="num">1203.5</td><td class="dv"><span class="neg" style="width:50.0%"></span></td><td class="num sgn">&minus;44</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="sheet-note">The top eight are all running events except the shot put; the bottom seven are all jumps and throws except the 800 m.</p>
+    <p style="margin-top:22px">
+      A 1250-point mark is above the javelin's elite median (1203.5) and below
+      the 5000 m's (1272). On these numbers the same score buys more standing in
+      the javelin than in the 5000 m.
     </p>
     <figure>
       <div class="plate">
         <img width="1650" height="900" src="../figures/fairness_boxplots.png" fetchpriority="high"
-          alt="Box plots of elite WA point scores for each of sixteen events, with distance events sitting visibly higher than throws and jumps and the javelin lowest." />
+          alt="Horizontal box plots of the top-30 WA scores for each of 16 events, sorted by median and coloured by discipline group, with distance and sprint events to the right of the dashed norm line and javelin and hammer furthest left." />
       </div>
-      <figcaption>Each event's elite scoring ceiling. Level tables would put these boxes in a row.</figcaption>
-    </figure>
-    <figure>
-      <div class="plate">
-        <img width="1350" height="900" src="../figures/deviation.png" loading="lazy"
-          alt="Bar chart of each event's deviation from the cross-event norm, running from the 5000 metres at plus 24 points down to the javelin at minus 44." />
-      </div>
-      <figcaption>Deviation from the cross-event norm, event by event.</figcaption>
+      <figcaption>Top-30 WA scores per event, with the cross-event norm as a dashed line.</figcaption>
     </figure>
   </section>
 
   <section class="stop stop--warn">
-    <p class="eyebrow">↓ the part most write-ups skip</p>
-    <h2>This does not prove the tables are miscoded</h2>
+    <p class="eyebrow">Limitations</p>
+    <h2>What this doesn't prove</h2>
     <p>
-      An event's elite score distribution reflects <strong>two</strong> things at
-      once: how the table is calibrated, and how deep and competitive that event's
-      current field is. A thinly contested event will show a lower ceiling
-      <em>even under a perfectly fair table</em>, simply because fewer athletes are
-      pushing its frontier.
+      An event's elite scores depend on two things at once: how the table converts
+      marks to points, and how deep the event's current field is. A thinly
+      contested event shows a lower ceiling even under a perfectly fair table,
+      because fewer athletes are pushing its front. Javelin and hammer may well be
+      thinner fields, and this study can't separate the two causes.
     </p>
     <p>
-      The javelin and hammer are exactly the events you would expect to be thin.
-      So the honest reading of this result is <strong>"equal points do not
-      currently mean equal elite standing,"</strong> not "the tables are wrong."
-      Both readings share the same chart; only one is supported by it.
+      So the supported reading is that equal points don't currently mean equal
+      elite standing across events. It does not show the tables are miscoded.
+      Separating calibration from depth would need each table checked against a
+      fixed frontier, such as the world record, and that is not done here.
     </p>
     <p>
-      Separating the two would need per-mark calibration against a fixed physical
-      frontier rather than against the current field. That is the natural next
-      step and it is not what this repository does. The gap is real; its cause is
-      part table and part talent pool.
+      The top 30 per event pools men and women, so one sex can fill most of an
+      event's elite slice. Two seasons is a short window, and the H and p values
+      come from the raw scrape, which is git-ignored and not in the repository.
     </p>
   </section>
 
   <section class="stop">
-    <p class="eyebrow">↓ so what</p>
+    <p class="eyebrow">Where it matters</p>
     <h2>What it changes in practice</h2>
-    <div class="grid">
-      <div class="cell">
-        <h3>Cross-event awards</h3>
-        <p>A points-based shortlist quietly favours distance runners over throwers
-           at the same standing within their event.</p>
-      </div>
-      <div class="cell">
-        <h3>Combined events</h3>
-        <p>The same points gap applies inside the decathlon and heptathlon, where
-           the tables decide the whole result.</p>
-      </div>
-      <div class="cell">
-        <h3>Cross-country comparisons</h3>
-        <p>Any national-strength measure built on WA points inherits this tilt:
-           including <a href="https://lyhjeremy.github.io/national-strength-profiles/">my own</a>,
-           which is why the two studies are published together.</p>
-      </div>
-    </div>
+    <p>
+      A points-based shortlist for a cross-event award favours distance runners
+      over throwers who stand equally high in their own events. The decathlon and
+      heptathlon use the same kind of conversion, so a similar tilt there is worth
+      testing, though this study only covers the individual-event tables. And any
+      national-strength measure built on WA points, including
+      <a href="https://lyhjeremy.github.io/national-strength-profiles/">mine</a>,
+      inherits whatever tilt the tables have.
+    </p>
   </section>
 
   <section class="stop stop--end">
-    <p class="eyebrow">Finish · how it was built</p>
+    <p class="eyebrow">How it was built</p>
     <h2>Where the numbers come from</h2>
     <dl class="specs">
-      <div class="spec"><dt>Data</dt><dd>World Athletics top lists, scraped with mark, WA points and nationality per event</dd></div>
-      <div class="spec"><dt>Sample</dt><dd>6,400 performances across 16 events, 2023–24</dd></div>
-      <div class="spec"><dt>Points</dt><dd>The WA score each mark was actually awarded, not recomputed</dd></div>
-      <div class="spec"><dt>Test</dt><dd>Kruskal-Wallis on the equality of elite score distributions across events</dd></div>
-      <div class="spec"><dt>Built with</dt><dd>Python, pandas, scipy, matplotlib</dd></div>
-      <div class="spec"><dt>Companion</dt><dd><a href="https://lyhjeremy.github.io/national-strength-profiles/">National Strength Profiles</a>, which spends this currency and inherits its tilt</dd></div>
+      <div class="spec"><dt>Data</dt><dd>World Athletics outdoor top lists, top 100 per event, men and women, 2023 and 2024</dd></div>
+      <div class="spec"><dt>Sample</dt><dd>6,400 performances across 16 events</dd></div>
+      <div class="spec"><dt>Points</dt><dd>The WA score each mark was awarded ("Results Score"), not recomputed</dd></div>
+      <div class="spec"><dt>Elite slice</dt><dd>Top 30 scores per event; event median compared with the median of medians</dd></div>
+      <div class="spec"><dt>Test</dt><dd>Kruskal-Wallis H test (SciPy) on the 16 top-30 distributions</dd></div>
+      <div class="spec"><dt>Built with</dt><dd>Python, pandas, lxml, SciPy, matplotlib</dd></div>
+      <div class="spec"><dt>Companion</dt><dd><a href="https://lyhjeremy.github.io/national-strength-profiles/">National strength profiles</a>, which uses these points</dd></div>
     </dl>
   </section>
 
@@ -387,14 +432,14 @@
     <h2>Equal points, unequal standing</h2>
     <div class="cta-row">
       <a class="btn btn-primary" href="../">Read the short version</a>
-      <a class="textlink" href="https://github.com/lyhjeremy/athletics-scoring-fairness">or the code and data</a>
+      <a class="textlink" href="https://github.com/lyhjeremy/athletics-scoring-fairness">Code and data on GitHub</a>
     </div>
   </section>
 
   <footer>
     <p>
-      Auditing the Scoring Tables ·
-      <a href="../">Story</a> ·
+      Auditing the scoring tables ·
+      <a href="../">Short version</a> ·
       <a href="https://github.com/lyhjeremy/athletics-scoring-fairness">Source</a> ·
       MIT © 2026 Jeremy Lee
     </p>

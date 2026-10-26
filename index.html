@@ -3,106 +3,86 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Auditing the Scoring Tables: are they actually fair?</title>
-<meta name="description" content="Track & field's scoring tables claim every event is comparable. Testing that against 6,400 elite performances: the best score 68 points higher in some events than others.">
+<title>Auditing the scoring tables: do WA points mean the same in every event?</title>
+<meta name="description" content="6,400 elite performances from the 2023 and 2024 World Athletics top lists: the median WA score of each event's top 30 ranges over 68.5 points, from the 5000 m down to the javelin. Kruskal-Wallis H = 236.">
+<link rel="stylesheet" href="assets/family.css">
 <style>
-@font-face{font-family:"Source Serif 4";src:url("fonts/SourceSerif4-400.woff2")format("woff2");font-weight:400;font-display:swap}
-@font-face{font-family:"Source Serif 4";src:url("fonts/SourceSerif4-600.woff2")format("woff2");font-weight:600;font-display:swap}
-@font-face{font-family:"IBM Plex Sans";src:url("fonts/IBMPlexSans-400.woff2")format("woff2");font-weight:400;font-display:swap}
-@font-face{font-family:"IBM Plex Sans";src:url("fonts/IBMPlexSans-600.woff2")format("woff2");font-weight:600;font-display:swap}
-@font-face{font-family:"IBM Plex Mono";src:url("fonts/IBMPlexMono-400.woff2")format("woff2");font-weight:400;font-display:swap}
-
-  :root{ --paper:#EDEDE7; --ink:#1C1E1B; --wine:#2C5852; --gold:#8C3A1E; --mut:#6b6656; }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:"Source Serif 4", "Iowan Old Style", "Palatino Linotype", Palatino, serif;line-height:1.65;}
-  .band{background:var(--ink);color:var(--paper);}
-  .band svg{display:block;width:100%;height:auto}
-  .wrap{max-width:760px;margin:0 auto;padding:0 22px;}
-  header .wrap{padding:38px 22px 30px;}
-  h1{font-size:2.1rem;line-height:1.15;margin:0 0 10px;}
-  .sub{font-size:1.15rem;color:#d8d2c4;margin:0;font-style:italic;}
-  h2{font-size:1.5rem;margin:2.4em 0 .5em;border-bottom:2px solid var(--gold);padding-bottom:.2em;}
-  p{margin:.8em 0;} .lead{font-size:1.18rem;}
-  figure{margin:1.6em 0;text-align:center;}
-  figure img{max-width:100%;height:auto;border:1px solid #e7e0d0;border-radius: 0;background:#F5F5F0;}
-  figcaption{font-size:.92rem;color:var(--mut);margin-top:.5em;font-style:italic;}
-  .stats{display:flex;flex-wrap:wrap;gap:14px;margin:1.4em 0;}
-  .stat{flex:1 1 150px;background:#F5F5F0;border:1px solid #e7e0d0;border-left:4px solid var(--gold);border-radius: 0;padding:14px 16px;}
-  .stat b{display:block;font-size:1.7rem;color:var(--wine);line-height:1.1;}
-  .stat span{font-size:.9rem;color:var(--mut);}
-  em.k{color:var(--wine);font-style:normal;font-weight:bold;}
-  a{color:var(--wine);}
-  .note{background:#F5F5F0;border:1px solid #e7e0d0;border-left:4px solid var(--mut);border-radius: 0;padding:14px 18px;color:#4a463c;font-size:.98rem;}
-  footer{border-top:1px solid #e0d9c8;margin-top:3em;padding:22px 0 50px;color:var(--mut);font-size:.92rem;}
-  code{background:#efe9db;padding:.05em .35em;border-radius: 0;font-size:.9em;}
+  * { box-sizing: border-box; border-radius: 0; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-head);
+         font-size: 18px; line-height: 1.65; }
+  a { color: var(--signal); }
+  :focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+  .bar-link { display: block; background: var(--ink); color: var(--paper); text-align: center; padding: 11px 18px;
+              font: 600 14.5px/1.45 var(--font-body); text-decoration: none; }
+  .bar-link:hover { text-decoration: underline; }
+  .wrap { width: min(100% - 2.6rem, 58rem); margin: 0 auto; }
+  .kick { font: 600 13px/1.4 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2);
+          margin: 36px 0 0; max-width: none; }
+  h1 { font: 800 clamp(44px, 7.6vw, 92px)/.92 var(--font-display); text-transform: uppercase; margin: 10px 0 0; max-width: 15ch; }
+  .board { margin-top: 32px; border: 3px solid var(--ink); }
+  .row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 12px;
+         padding: 14px 20px; border-bottom: 1px solid var(--rule); }
+  .row .ev { font: 700 clamp(26px, 4vw, 40px)/1 var(--font-display); text-transform: uppercase; }
+  .row .ev small { display: block; font: 400 14px/1.4 var(--font-body); text-transform: none; color: var(--ink-2); margin-top: 6px; }
+  .row .pts { font: 800 clamp(54px, 9vw, 104px)/.9 var(--font-display); }
+  .row.hi .pts { color: var(--signal-2); }
+  .row.lo .pts { color: var(--signal); }
+  .gap { background: var(--ink); color: var(--paper); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+         padding: 12px 20px; font: 600 13px/1.5 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
+  .lede { color: var(--ink-2); margin: 26px 0 0; max-width: 62ch; }
+  h2 { font: 700 clamp(28px, 4vw, 42px)/1 var(--font-display); text-transform: uppercase; margin: 64px 0 12px; }
+  p { max-width: 62ch; }
+  figure { margin: 24px 0 0; }
+  figure img { display: block; max-width: 100%; height: auto; border: 1px solid var(--rule); background: var(--panel); }
+  figcaption { font: 400 14.5px/1.5 var(--font-body); color: var(--ink-2); margin-top: 10px; }
+  .caveat { border: 1px solid var(--edge); padding: 18px 22px; margin-top: 18px; max-width: 62ch; }
+  .caveat p { margin: 0 0 10px; }
+  .caveat p:last-child { margin: 0; }
+  footer { border-top: 1px solid var(--rule); margin-top: 70px; padding: 22px 0 54px;
+           font: 400 14.5px/1.6 var(--font-body); color: var(--ink-2); }
+  footer a { color: var(--ink-2); }
 </style>
 </head>
 <body>
-<a href="overview/" data-overview-link style="display:block;background:#1C1E1B;color:#EDEDE7;text-align:center;padding:11px 18px;font:600 14.5px/1.45 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.01em;text-decoration:none">Read the full writeup&nbsp;&rarr;</a>
-
-<div class="band">
-  <svg viewBox="0 0 760 132" preserveAspectRatio="none" role="img" aria-label="uneven bars">
-    <rect x="60" y="40" width="70" height="70" fill="#2C5852"/>
-    <rect x="160" y="55" width="70" height="55" fill="#b5651d"/>
-    <rect x="260" y="35" width="70" height="75" fill="#c99a3b"/>
-    <rect x="360" y="62" width="70" height="48" fill="#2a7f62"/>
-    <rect x="460" y="72" width="70" height="38" fill="#4a7ba6"/>
-    <rect x="560" y="80" width="70" height="30" fill="#4a7ba6"/>
-    <line x1="40" y1="110" x2="720" y2="110" stroke="#8C3A1E" stroke-width="2.5"/>
-  </svg>
-</div>
-<header>
-  <div class="wrap">
-    <h1>Are the Scoring Tables Actually Fair?</h1>
-    <p class="sub">Track &amp; field's universal currency, tested against the world's best.</p>
-  </div>
-</header>
+<a class="bar-link" href="overview/" data-overview-link>Read the full writeup&nbsp;&rarr;</a>
 
 <main class="wrap">
-  <p class="lead">All of track &amp; field runs on one quiet assumption: that 1200 points in the shot
-  put is exactly as impressive as 1200 points in the 100 m. The combined events, athlete-of-the-year
-  votes, every GOAT argument. All of it leans on the scoring tables treating events equally. So I put
-  that to the test against <strong>6,400 elite performances</strong>, each carrying the WA points the
-  sport itself awarded it.</p>
+  <p class="kick">Auditing the scoring tables · 16 events · 2023 and 2024</p>
+  <h1>Equal points, unequal events</h1>
 
-  <div class="stats">
-    <div class="stat"><b>68 pts</b><span>gap between the best- and worst-scoring event's elite ceiling</span></div>
-    <div class="stat"><b>p ≈ 10⁻⁴²</b><span>that the events score equally, decisively rejected</span></div>
-    <div class="stat"><b>16 events</b><span>6,400 top performances, 134 nations (2023–24)</span></div>
+  <div class="board" role="group" aria-label="Highest and lowest event by top-30 median WA score">
+    <div class="row hi"><span class="ev">5000 m<small>Highest top-30 median, 24.5 above the norm</small></span><span class="pts">1272</span></div>
+    <div class="row lo"><span class="ev">Javelin<small>Lowest top-30 median, 44 below the norm</small></span><span class="pts">1203.5</span></div>
+    <div class="gap"><span>Gap 68.5 points</span><span>Kruskal-Wallis H = 236, p &asymp; 10<sup>&minus;42</sup></span></div>
   </div>
 
-  <h2>The elite ceiling isn't level</h2>
-  <p>Rank each event by the median WA score of its top-30 performances and a clear gradient appears:
-  the <em class="k">5000 m and 1500 m</em> sit highest, a full 68 points above the <em class="k">javelin
-  and hammer</em> at the bottom. Running events score higher at the top than the throws and jumps.
-  Among today's elite, 1250 points is an unremarkable distance-running season, and a near-national-record
-  javelin throw.</p>
+  <p class="lede">World Athletics points are meant to make a 1200-point shot put worth the same as a
+  1200-point 100 m. I scraped 6,400 performances from the 2023 and 2024 top lists (top 100 per event,
+  men and women), each with the points it was awarded, and compared the median of each event's 30
+  highest scores. Level tables would put those medians close together. They spread over 68.5 points,
+  with running events at the top and jumps and throws at the bottom.</p>
+
+  <h2>Every event against the norm</h2>
   <figure>
-    <img src="figures/fairness_boxplots.png" alt="Box plots of elite WA scores by event, sorted, coloured by discipline">
-    <figcaption>Each event's top-30 WA scores. Distance running clusters high; throws and jumps sit below the norm.</figcaption>
-  </figure>
-  <figure>
-    <img src="figures/deviation.png" alt="Per-event deviation from the cross-event norm">
-    <figcaption>How far each event's elite ceiling sits above (wine) or below (blue) the cross-event norm.</figcaption>
+    <img width="1350" height="900" src="figures/deviation.png" alt="Horizontal bar chart of each event's top-30 median WA score minus the cross-event norm of 1247.5, from the 5000 m at about plus 24 down to the javelin at minus 44. Running events sit above zero and most jumps and throws below.">
+    <figcaption>Deviation of each event's top-30 median from the median of all 16 event medians (1247.5). Bar labels are rounded to whole points.</figcaption>
   </figure>
 
-  <h2>What it proves, and what it doesn't</h2>
-  <div class="note">An event's elite scores depend on <strong>two</strong> things: how the table converts
-  marks to points, <em>and</em> how deep its current field is. Distance running is in a golden, crowded
-  era; the hammer and javelin are thinner, and a thin event shows a lower ceiling even under a perfectly
-  fair table. So the honest claim isn't "the tables are miscoded." It's the sharper one:
-  <strong>equal points don't currently buy equal standing across events</strong>. Part calibration, part
-  talent pool. The universal number is, in practice, worth more in some events than others.</div>
-
-  <p style="margin-top:1.6em;"><a href="https://github.com/lyhjeremy/athletics-scoring-fairness">Code &amp; full method on GitHub.</a></p>
+  <h2>What it shows, and what it doesn't</h2>
+  <div class="caveat">
+    <p>An event's elite scores depend on the table's calibration and on how deep the current field is.
+    A thinly contested event shows a lower ceiling even under a fair table. This study can't separate
+    the two, so the claim is that equal points don't currently mean equal elite standing. It does not
+    show the tables are miscoded.</p>
+    <p>The top 30 pools men and women, and two seasons is a short window. Checking each table against a
+    fixed frontier, such as the world record, would be the next step.</p>
+  </div>
+  <p>The <a href="overview/">full writeup</a> has the result sheet for all 16 events and the box plots.</p>
 </main>
 
-<footer>
-  <div class="wrap">
-    Built by <a href="https://github.com/lyhjeremy">Jeremy Lee</a> ·
-    <a href="https://github.com/lyhjeremy/athletics-scoring-fairness">source on GitHub</a> ·
-    data scraped from World Athletics top lists · Kruskal-Wallis via <code>scipy</code>.
-  </div>
+<footer class="wrap">
+  Jeremy Lee · <a href="https://github.com/lyhjeremy/athletics-scoring-fairness">Source on GitHub</a> ·
+  <a href="overview/">Full writeup</a> · Data from World Athletics top lists · Kruskal-Wallis via SciPy
 </footer>
 </body>
 </html>
