@@ -13,7 +13,7 @@ Design and copy follow [these standards](https://github.com/lyhjeremy/lyhjeremy/
 - Running events score higher at the top. Seven of the eight events above the norm are running events (the shot put is the exception); seven of the eight below it are jumps and throws (the 800 m is the exception).
 
 <p align="center">
-  <img src="figures/fairness_boxplots.png" alt="Horizontal box plots of the top-30 WA scores for each of 16 events, sorted by median and coloured by discipline group, with distance and sprint events right of the dashed norm line and javelin and hammer furthest left." width="840">
+  <img src="figures/fairness_boxplots.png" alt="Horizontal box plots of the top-30 WA scores for each of 16 events, sorted by median and colored by discipline group, with distance and sprint events right of the dashed norm line and javelin and hammer furthest left." width="840">
 </p>
 
 ## Method
@@ -48,8 +48,7 @@ python analyze.py         # elite-ceiling comparison and Kruskal-Wallis -> figur
 
 ## Limitations
 
-- An event's elite scores reflect both the table's calibration and the depth of its current field. A thin field shows a lower ceiling even under a fair table, and this study can't separate the two. The supported claim is that equal points don't currently mean equal elite standing, not that the tables are miscoded.
-- Separating the causes would need each table checked against a fixed frontier, such as the world record.
+- An event's elite scores reflect both the table's calibration and the depth of its current field. A thin field shows a lower ceiling even under a fair table, and this study can't separate the two. What the data supports is the narrower claim: equal points don't currently mean equal elite standing. Whether any one table is miscoded is a separate question, and answering it would need each table checked against a fixed frontier, such as the world record.
 - The top 30 pools men and women, and two seasons is a short window.
 - H and p come from the raw scrape, which is git-ignored, so only the per-event table is reproducible from the committed files.
 
