@@ -259,6 +259,53 @@
 </style>
 </head>
 <body>
+<style>
+  /* page-specific: score strip with a reader-set mark, sortable result sheet */
+  .probe { margin-top: 40px; border-top: 2px solid var(--ink); padding-top: 20px; }
+  .probe h2 { max-width: none; margin-top: 0; }
+  .probe > p { color: var(--ink2); max-width: 62ch; margin: 0 0 12px; }
+  .dial { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; margin: 18px 0 6px; }
+  .dial label { font: 600 12px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .dial input[type=range] { flex: 1 1 220px; min-width: 0; accent-color: var(--accent); }
+  .dial output { font: 800 54px/1 var(--display); color: var(--ink); min-width: 4ch; text-align: right; letter-spacing: .01em; }
+  .dial .step { font: 600 13px/1 var(--mono); padding: 8px 10px; background: var(--card); color: var(--ink); border: 1px solid var(--edge); cursor: pointer; }
+  .dial .step:hover { background: var(--ink); color: var(--paper); }
+  @media (max-width: 600px) {
+    .dial { gap: 10px; }
+    .dial label { order: -2; flex: 0 0 auto; }
+    .dial output { order: -1; flex: 1 0 auto; text-align: right; font-size: 44px; }
+  }
+  .chart { width: 100%; touch-action: pan-y; }
+  .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .chart text { font-family: var(--sans); font-size: 12.5px; fill: var(--ink2); }
+  .chart .ax { fill: var(--muted); font-size: 11.5px; }
+  .chart .grid { stroke: var(--rule); }
+  .chart .norm { stroke: var(--edge); stroke-dasharray: 3 4; }
+  .chart .lane { stroke: var(--rule); stroke-dasharray: 1 3; }
+  .chart .me { stroke: var(--ink); stroke-width: 2; }
+  .chart .metag { fill: var(--ink); font-weight: 600; font-size: 12px; }
+  .chart .gap { stroke-width: 3; }
+  .chart .gap.over { stroke: var(--accent2); } .chart .gap.under { stroke: var(--accent); }
+  .chart .m { stroke-width: 2; }
+  .chart .m.over { fill: var(--accent2); stroke: var(--accent2); }
+  .chart .m.under { fill: var(--paper); stroke: var(--accent); }
+  .chart .val { font: 400 11.5px var(--mono); fill: var(--muted); }
+  .verdict { font-family: var(--sans); font-size: 16px; color: var(--ink2); margin: 10px 0 0; max-width: 64ch; min-height: 3em; }
+  .verdict b { color: var(--ink); }
+  .key { display: flex; flex-wrap: wrap; gap: 6px 22px; font: 400 13.5px/1.4 var(--sans); color: var(--muted); margin-top: 8px; }
+  .key i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px; border: 2px solid; }
+  .key .o { background: var(--accent2); border-color: var(--accent2); } .key .u { border-color: var(--accent); }
+  .sheet button.sort { all: unset; cursor: pointer; font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; }
+  .sheet button.sort:hover { color: var(--ink); text-decoration: underline; }
+  .sheet button.sort:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .sheet th[aria-sort] button::after { content: " \2195"; color: var(--rule); }
+  .sheet th[aria-sort="ascending"] button::after { content: " \2191"; color: var(--accent); }
+  .sheet th[aria-sort="descending"] button::after { content: " \2193"; color: var(--accent); }
+  .sheet td:nth-child(2) { white-space: nowrap; }
+  .sheet td.yours { font: 400 14px var(--mono); text-align: right; }
+  .sheet td.yours.over { color: var(--accent2); } .sheet td.yours.under { color: var(--accent); }
+</style>
+
 <div class="wrap">
   <header class="masthead">
     <div class="logo"><span class="dot" aria-hidden="true"></span>Auditing the scoring tables</div>
@@ -270,14 +317,11 @@
     <h1>The best 5000 m runners outscore the best javelin throwers by 68.5 points</h1>
 
     <p class="hero-sub">
-      World Athletics points are meant to make a 1200-point shot put equal to a
-      1200-point 100 m. Combined events, cross-event awards and every comparison of
-      athletes from different events rely on that. I scraped 6,400 performances
-      from the 2023 and 2024 top lists, each with the points it was awarded, and
-      compared the median score of each event's top 30. If the tables were level,
-      those medians would sit close together. They range from 1203.5 in the javelin
-      to 1272 in the 5000 m, and a Kruskal-Wallis test rejects equal distributions
-      (H = 236, p &asymp; 10<sup>&minus;42</sup>).
+      World Athletics points are meant to make a 1200-point shot put worth the same as a
+      1200-point 100 m. If that held, the top 30 marks in every event would earn about the
+      same points. In the 2023 and 2024 top lists they don't: the median ranges from 1203.5
+      in the javelin to 1272 in the 5000 m, and running events sit high while jumps and
+      throws sit low.
     </p>
 
     <div class="cta-row">
@@ -303,6 +347,26 @@
         <p>Kruskal-Wallis statistic across the 16 events' top-30 scores, p &asymp; 10<sup>&minus;42</sup>.</p>
       </div>
     </div>
+
+    <figure class="probe">
+      <h2>Where does one score land?</h2>
+      <p>
+        Pick a WA score. Each event's dot is the median of its 30 best marks from 2023 and
+        2024; the line shows how far your score sits above or below it.
+      </p>
+      <div class="dial">
+        <label for="sf-score">WA score</label>
+        <button type="button" class="step" data-d="-1" aria-label="One point lower">&minus;1</button>
+        <input id="sf-score" type="range" min="1180" max="1300" step="0.5" value="1250" />
+        <button type="button" class="step" data-d="1" aria-label="One point higher">+1</button>
+        <output id="sf-out" for="sf-score">1250</output>
+      </div>
+      <div class="chart" id="sf-strip"></div>
+      <div class="key"><span><i class="o"></i>Your score clears the event's elite median</span><span><i class="u"></i>Falls short of it</span><span>Dashed line: norm, 1247.5</span></div>
+      <p class="verdict" id="sf-verdict" aria-live="polite"></p>
+      <figcaption>Event medians from <code>tables/fairness_by_event.csv</code>, drawn in the browser.
+        Men and women are pooled in each event's top 30, as in the analysis.</figcaption>
+    </figure>
   </section>
 </div>
 
@@ -313,17 +377,18 @@
     <p class="eyebrow">The question</p>
     <h2>A claim the sport's own data can test</h2>
     <p>
-      The scoring tables sit underneath every cross-event comparison: a
-      decathlete's javelin against their 1500 m, a shot putter against a miler for
-      an award, or a country's strength across events, as in my
+      The scoring tables sit under every cross-event comparison: a decathlete's javelin
+      against their 1500 m, a shot putter against a miler for an award, or a country's
+      strength across events, as in my
       <a href="https://lyhjeremy.github.io/national-strength-profiles/">national strength profiles</a>.
       Any bias in the tables carries into all of them.
     </p>
     <p>
-      If the tables are level, the best performers in each event should earn about
-      the same number of points, because each group is at the front of its own
-      event. The World Athletics top lists publish the points each mark was
-      awarded, so this can be checked without recomputing anything.
+      The World Athletics top lists publish the points each mark was awarded, so the check
+      needs no recomputing. I scraped the top 100 performances per event for men and women
+      in 2023 and 2024, 6,400 marks across 16 events, and took the 30 highest scores in
+      each event as its elite slice. A Kruskal-Wallis test rejects the idea that the 16
+      slices come from one distribution (H = 236, p &asymp; 10<sup>&minus;42</sup>).
     </p>
   </section>
 
@@ -331,13 +396,21 @@
     <p class="eyebrow">The result sheet</p>
     <h2>Sixteen events against the norm</h2>
     <p>
-      For each event, the 30 highest WA scores from 2023 and 2024 (men and women
-      pooled), their median, and its distance from the median of all 16 event
-      medians (1247.5). From <code>tables/fairness_by_event.csv</code>.
+      Seven of the eight events above the norm are running events; the shot put is the
+      exception. Seven of the eight below it are jumps and throws; the 800 m is the
+      exception. Sort by any column. The last column follows the score you picked above.
     </p>
     <div class="tablewrap" role="region" aria-label="Elite median WA score and deviation from the norm for 16 events" tabindex="0">
-      <table class="sheet">
-        <thead><tr><th>Pl</th><th>Event</th><th>Group</th><th class="num">Top-30 median</th><th>Below / above norm</th><th class="num">Dev</th></tr></thead>
+      <table class="sheet" id="sf-sheet">
+        <thead><tr>
+          <th class="pl" aria-sort="none"><button class="sort" data-k="pl">Pl</button></th>
+          <th aria-sort="none"><button class="sort" data-k="ev">Event</button></th>
+          <th aria-sort="none"><button class="sort" data-k="grp">Group</button></th>
+          <th class="num" aria-sort="descending"><button class="sort" data-k="med">Top-30 median</button></th>
+          <th>Below / above norm</th>
+          <th class="num">Dev</th>
+          <th class="num" id="sf-yours-h">At 1250</th>
+        </tr></thead>
         <tbody>
           <tr><td class="pl">1</td><td>5000 m</td><td>distance</td><td class="num">1272</td><td class="dv"><span class="pos" style="width:27.8%"></span></td><td class="num sgn">+24.5</td></tr>
           <tr><td class="pl">2</td><td>1500 m</td><td>middle</td><td class="num">1260</td><td class="dv"><span class="pos" style="width:14.2%"></span></td><td class="num sgn">+12.5</td></tr>
@@ -358,18 +431,14 @@
         </tbody>
       </table>
     </div>
-    <p class="sheet-note">The top eight are all running events except the shot put; the bottom seven are all jumps and throws except the 800 m.</p>
-    <p style="margin-top:22px">
-      A 1250-point mark is above the javelin's elite median (1203.5) and below
-      the 5000 m's (1272). On these numbers the same score buys more standing in
-      the javelin than in the 5000 m.
-    </p>
+    <p class="sheet-note">From <code>tables/fairness_by_event.csv</code>. The heavy rule marks where the events cross the norm.</p>
     <figure>
       <div class="plate">
-        <img width="1650" height="900" src="../figures/fairness_boxplots.png" fetchpriority="high"
+        <img width="1650" height="900" src="../figures/fairness_boxplots.png" loading="lazy"
           alt="Horizontal box plots of the top-30 WA scores for each of 16 events, sorted by median and colored by discipline group, with distance and sprint events to the right of the dashed norm line and javelin and hammer furthest left." />
       </div>
-      <figcaption>Top-30 WA scores per event, with the cross-event norm as a dashed line.</figcaption>
+      <figcaption>The spread behind each median: all 30 top scores per event as box plots, drawn by
+        <code>analyze.py</code> from the raw scrape. The dashed line is the norm.</figcaption>
     </figure>
   </section>
 
@@ -377,22 +446,23 @@
     <p class="eyebrow">Limitations</p>
     <h2>What this doesn't prove</h2>
     <p>
-      An event's elite scores depend on two things at once: how the table converts
-      marks to points, and how deep the event's current field is. A thinly
-      contested event shows a lower ceiling even under a perfectly fair table,
-      because fewer athletes are pushing its front. Javelin and hammer may well be
-      thinner fields, and this study can't separate the two causes.
+      An event's elite scores depend on two things at once: how the table converts marks to
+      points, and how deep the event's current field is. A thinly contested event shows a
+      lower ceiling even under a perfectly fair table, because fewer athletes are pushing its
+      front. Javelin and hammer may well be thinner fields, and this study can't separate
+      the two causes.
     </p>
     <p>
-      So the supported reading is that equal points don't currently mean equal
-      elite standing across events. It does not show the tables are miscoded.
-      Separating calibration from depth would need each table checked against a
-      fixed frontier, such as the world record, and that is not done here.
+      So the supported reading is that equal points don't currently mean equal elite
+      standing across events. Whether any one table is miscoded is a separate question.
+      Answering it would need each table checked against a fixed frontier, such as the
+      world record, and that is not done here.
     </p>
     <p>
-      The top 30 per event pools men and women, so one sex can fill most of an
-      event's elite slice. Two seasons is a short window, and the H and p values
-      come from the raw scrape, which is git-ignored and not in the repository.
+      The top 30 per event pools men and women, so one sex can fill most of an event's
+      elite slice. Two seasons is a short window, and a different pair of years could
+      reorder events near the norm. H and p come from the raw scrape, which is git-ignored,
+      so only the per-event table is reproducible from the committed files.
     </p>
   </section>
 
@@ -400,12 +470,11 @@
     <p class="eyebrow">Where it matters</p>
     <h2>What it changes in practice</h2>
     <p>
-      A points-based shortlist for a cross-event award favors distance runners
-      over throwers who stand equally high in their own events. The decathlon and
-      heptathlon use the same kind of conversion, so a similar tilt there is worth
-      testing, though this study only covers the individual-event tables. And any
-      national-strength measure built on WA points, including
-      <a href="https://lyhjeremy.github.io/national-strength-profiles/">mine</a>,
+      A points-based shortlist for a cross-event award favors distance runners over
+      throwers who stand just as high in their own events. The decathlon and heptathlon use
+      the same kind of conversion, so a similar tilt there is worth testing, though this
+      study only covers the individual-event tables. Any national-strength measure built on
+      WA points, including <a href="https://lyhjeremy.github.io/national-strength-profiles/">mine</a>,
       inherits whatever tilt the tables have.
     </p>
   </section>
@@ -419,7 +488,7 @@
       <div class="spec"><dt>Points</dt><dd>The WA score each mark was awarded ("Results Score"), not recomputed</dd></div>
       <div class="spec"><dt>Elite slice</dt><dd>Top 30 scores per event; event median compared with the median of medians</dd></div>
       <div class="spec"><dt>Test</dt><dd>Kruskal-Wallis H test (SciPy) on the 16 top-30 distributions</dd></div>
-      <div class="spec"><dt>Built with</dt><dd>Python, pandas, lxml, SciPy, matplotlib</dd></div>
+      <div class="spec"><dt>Built with</dt><dd>Python, pandas, lxml, SciPy, matplotlib; the score strip and sortable sheet are plain SVG and JavaScript</dd></div>
       <div class="spec"><dt>Companion</dt><dd><a href="https://lyhjeremy.github.io/national-strength-profiles/">National strength profiles</a>, which uses these points</dd></div>
     </dl>
   </section>
@@ -446,5 +515,109 @@
     <p>Performance data from World Athletics top lists.</p>
   </footer>
 </div>
+
+<script>
+(function () {
+  // event, group, top-30 median WA score; from tables/fairness_by_event.csv
+  var E = [["Javelin","throw",1203.5],["Hammer","throw",1208.5],["High jump","jump",1219],["Triple jump","jump",1220],
+    ["Long jump","jump",1224],["Discus","throw",1236],["800 m","middle",1241.5],["Pole vault","jump",1245],
+    ["Shot put","throw",1250],["400 m","sprint",1253],["10,000 m","distance",1253.5],["Marathon","distance",1254],
+    ["200 m","sprint",1258],["100 m","sprint",1259],["1500 m","middle",1260],["5000 m","distance",1272]];
+  var NORM = 1247.5, score = 1250;
+  var NS = "http://www.w3.org/2000/svg";
+  function el(t, a, p) { var e = document.createElementNS(NS, t); for (var k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; }
+  function tx(s, a, p) { var e = el("text", a, p); e.textContent = s; return e; }
+  function sg(v) { v = Math.round(v * 10) / 10; return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v); }
+  var box = document.getElementById("sf-strip"), inp = document.getElementById("sf-score"),
+      out = document.getElementById("sf-out"), verdict = document.getElementById("sf-verdict");
+  var rows = E.slice().sort(function (a, b) { return b[2] - a[2]; });
+
+  function draw() {
+    var W = Math.max(300, box.clientWidth), small = W < 560;
+    var m = { l: small ? 84 : 104, r: small ? 44 : 60, t: 26, b: 26 }, rh = small ? 22 : 25;
+    var H = m.t + m.b + rh * rows.length, pw = W - m.l - m.r;
+    var lo = 1180, hi = 1300, X = function (v) { return m.l + (v - lo) / (hi - lo) * pw; };
+    box.textContent = "";
+    var svg = el("svg", { viewBox: "0 0 " + W + " " + H, role: "img",
+      "aria-label": "Top-30 median WA score for 16 events, from 1203.5 in the javelin to 1272 in the 5000 m, against a chosen score of " + score + "." }, box);
+    for (var v = 1180; v <= 1300; v += 20) {
+      el("line", { x1: X(v), x2: X(v), y1: m.t - 6, y2: H - m.b, "class": "grid" }, svg);
+      tx(String(v), { x: X(v), y: H - 8, "text-anchor": "middle", "class": "ax" }, svg);
+    }
+    el("line", { x1: X(NORM), x2: X(NORM), y1: m.t - 6, y2: H - m.b, "class": "norm" }, svg);
+    rows.forEach(function (r, i) {
+      var y = m.t + rh * i + rh / 2, over = score >= r[2];
+      el("line", { x1: m.l, x2: m.l + pw, y1: y, y2: y, "class": "lane" }, svg);
+      tx(r[0], { x: m.l - 10, y: y + 4, "text-anchor": "end" }, svg);
+      if (Math.abs(score - r[2]) > 0.1) el("line", { x1: X(r[2]), x2: X(score), y1: y, y2: y, "class": "gap " + (over ? "over" : "under") }, svg);
+      el("rect", { x: X(r[2]) - 5, y: y - 5, width: 10, height: 10, "class": "m " + (over ? "over" : "under") }, svg);
+      tx(sg(score - r[2]), { x: m.l + pw + 8, y: y + 4, "class": "val" }, svg);
+    });
+    el("line", { x1: X(score), x2: X(score), y1: m.t - 14, y2: H - m.b, "class": "me" }, svg);
+    tx(String(score), { x: X(score), y: m.t - 17, "text-anchor": "middle", "class": "metag" }, svg);
+    var hit = el("rect", { x: m.l, y: 0, width: pw, height: H, fill: "transparent" }, svg);
+    hit.addEventListener("pointermove", function (ev) {
+      if (ev.pointerType === "mouse" && ev.buttons !== 1) return;
+      var b = svg.getBoundingClientRect(), x = (ev.clientX - b.left) * (W / b.width);
+      set(Math.round((lo + (x - m.l) / pw * (hi - lo)) * 2) / 2);
+    });
+    hit.addEventListener("pointerdown", function (ev) {
+      var b = svg.getBoundingClientRect(), x = (ev.clientX - b.left) * (W / b.width);
+      set(Math.round((lo + (x - m.l) / pw * (hi - lo)) * 2) / 2);
+    });
+  }
+  function talk() {
+    out.textContent = score;
+    var clear = rows.filter(function (r) { return score >= r[2]; });
+    var jav = E[0], k5 = E[E.length - 1];
+    var field = clear.filter(function (r) { return r[1] === "throw" || r[1] === "jump"; }).length;
+    var s = "<b>" + score + " points clears the elite median in " + clear.length + " of 16 events:</b> " +
+      field + " of the 8 jumps and throws, " + (clear.length - field) + " of the 8 running events. " +
+      "It is " + sg(score - jav[2]) + " against the javelin's elite median and " + sg(score - k5[2]) + " against the 5000 m's";
+    verdict.innerHTML = s + ".";
+    document.getElementById("sf-yours-h").textContent = "At " + score;
+    sheetRows.forEach(function (tr) {
+      var d = score - +tr.dataset.med, c = tr.querySelector(".yours");
+      c.textContent = sg(d); c.className = "yours " + (d >= 0 ? "over" : "under");
+    });
+  }
+  function set(v) { score = Math.max(1180, Math.min(1300, v)); inp.value = score; draw(); talk(); }
+  inp.addEventListener("input", function () { set(+inp.value); });
+  document.querySelectorAll(".dial .step").forEach(function (b) { b.addEventListener("click", function () { set(score + +b.dataset.d); }); });
+
+  // sortable sheet: keep the original rows, add a live column
+  var tbody = document.querySelector("#sf-sheet tbody"), sheetRows = Array.prototype.slice.call(tbody.rows);
+  sheetRows.forEach(function (tr) {
+    var c = tr.cells;
+    tr.dataset.pl = c[0].textContent; tr.dataset.ev = c[1].textContent; tr.dataset.grp = c[2].textContent; tr.dataset.med = c[3].textContent;
+    var td = document.createElement("td"); td.className = "yours"; tr.appendChild(td);
+  });
+  var GRP = { sprint: 0, middle: 1, distance: 2, jump: 3, throw: 4 };
+  document.querySelectorAll("#sf-sheet .sort").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var th = b.parentNode, k = b.dataset.k, cur = th.getAttribute("aria-sort");
+      var dir = cur === "ascending" ? "descending" : cur === "descending" ? "ascending" : (k === "med" ? "descending" : "ascending");
+      document.querySelectorAll("#sf-sheet th[aria-sort]").forEach(function (h) { h.setAttribute("aria-sort", "none"); });
+      th.setAttribute("aria-sort", dir);
+      var f = dir === "ascending" ? 1 : -1;
+      sheetRows.sort(function (a, c) {
+        var x, y;
+        if (k === "ev") { x = a.dataset.ev; y = c.dataset.ev; return f * x.localeCompare(y, "en", { numeric: true }); }
+        if (k === "grp") { x = GRP[a.dataset.grp]; y = GRP[c.dataset.grp]; if (x === y) return c.dataset.med - a.dataset.med; return f * (x - y); }
+        if (k === "pl") return f * (a.dataset.pl - c.dataset.pl);
+        return f * (a.dataset.med - c.dataset.med);
+      });
+      var sorted = k === "med" || k === "pl";
+      sheetRows.forEach(function (tr, i) {
+        var prev = sheetRows[i - 1];
+        tr.classList.toggle("norm", sorted && !!prev && (prev.dataset.med > NORM) !== (tr.dataset.med > NORM));
+        tbody.appendChild(tr);
+      });
+    });
+  });
+  var rt; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(draw, 120); });
+  draw(); talk();
+})();
+</script>
 </body>
 </html>

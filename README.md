@@ -25,7 +25,7 @@ Design and copy follow [these standards](https://github.com/lyhjeremy/lyhjeremy/
 
 ## Stack
 
-Python, pandas, lxml, NumPy, SciPy, matplotlib. Static site on GitHub Pages.
+Python, pandas, lxml, NumPy, SciPy, matplotlib. Static site on GitHub Pages. The write-up lets you pick a WA score and see which events' elite medians it clears; that chart and its sortable table are plain SVG and JavaScript reading the numbers in `tables/fairness_by_event.csv`.
 
 ## How to run
 
